@@ -296,29 +296,29 @@ function App() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900 text-slate-100">
-      <header className="sticky top-0 z-30 border-b border-slate-800/80 bg-slate-950/85 backdrop-blur-xl">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6">
+      <header className="sticky top-0 z-30 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-xl">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 px-3 py-2 sm:gap-4 sm:px-6 sm:py-4">
           <div className="flex items-end justify-between gap-3">
             <div>
-              <h1 className="text-2xl font-black tracking-tight text-red-500 sm:text-3xl">MCU Tracker</h1>
-              <p className="text-xs text-slate-400 sm:text-sm">Anotador de Universo Cinematografico Marvel de Santi y Clari</p>
+              <h1 className="text-xl font-black tracking-tight text-red-500 sm:text-3xl">MCU Tracker</h1>
+              <p className="hidden text-xs text-slate-400 sm:block sm:text-sm">Anotador de Universo Cinematografico Marvel de Santi y Clari</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
-            <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3 text-slate-300">
+          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 text-xs sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0 sm:text-sm">
+            <div className="min-w-[130px] rounded-xl border border-slate-800 bg-slate-900/70 p-2 text-slate-300 sm:min-w-0 sm:p-3">
               Total vistos: <span className="font-semibold text-slate-100">{estadisticas.vistosTotal}</span>/{estadisticas.total}
             </div>
-            <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3 text-slate-300">
+            <div className="min-w-[130px] rounded-xl border border-slate-800 bg-slate-900/70 p-2 text-slate-300 sm:min-w-0 sm:p-3">
               Pelis vistas: <span className="font-semibold text-slate-100">{estadisticas.peliculasVistas}</span>/{estadisticas.totalPeliculas}
             </div>
-            <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3 text-slate-300">
+            <div className="min-w-[130px] rounded-xl border border-slate-800 bg-slate-900/70 p-2 text-slate-300 sm:min-w-0 sm:p-3">
               Series vistas: <span className="font-semibold text-slate-100">{estadisticas.seriesVistas}</span>/{estadisticas.totalSeries}
             </div>
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap gap-2">
+          <div className="flex flex-col gap-2 sm:gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="-mx-1 flex gap-2 overflow-x-auto px-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
               {[
                 { key: 'todo', label: 'Todo' },
                 { key: 'series', label: 'Series' },
@@ -328,7 +328,7 @@ function App() {
                   key={opcion.key}
                   type="button"
                   onClick={() => setFiltroTipo(opcion.key)}
-                  className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                  className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition sm:px-4 sm:py-2 sm:text-sm ${
                     filtroTipo === opcion.key
                       ? 'border-red-500 bg-red-500 text-white'
                       : 'border-slate-700 bg-slate-900 text-slate-300 hover:border-slate-500 hover:text-slate-100'
@@ -339,7 +339,7 @@ function App() {
               ))}
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="-mx-1 flex gap-2 overflow-x-auto px-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
               {[
                 { key: 'todos', label: 'Todos' },
                 { key: 'vistos', label: 'Vistos' },
@@ -349,7 +349,7 @@ function App() {
                   key={opcion.key}
                   type="button"
                   onClick={() => setFiltroVisto(opcion.key)}
-                  className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                  className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition sm:px-4 sm:py-2 sm:text-sm ${
                     filtroVisto === opcion.key
                       ? 'border-emerald-500 bg-emerald-500 text-white'
                       : 'border-slate-700 bg-slate-900 text-slate-300 hover:border-slate-500 hover:text-slate-100'
