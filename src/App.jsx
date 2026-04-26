@@ -1,8 +1,21 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import data from './data.json'
+import posterCacheSeed from './tmdbPosterCache.json'
 
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w500'
-const posterCache = new Map()
+const TMDB_LOCAL_CACHE_KEY = 'mcu-tmdb-poster-cache'
+const posterCache = new Map(Object.entries(posterCacheSeed))
+
+if (typeof window !== 'undefined') {
+  try {
+    const cacheLocal = JSON.parse(localStorage.getItem(TMDB_LOCAL_CACHE_KEY) ?? '{}')
+    Object.entries(cacheLocal).forEach(([key, value]) => {
+      posterCache.set(key, value)
+    })
+  } catch {
+    // Ignora cache local corrupto y sigue con el cache versionado.
+  }
+}
 const MCU_SEARCH_TITLES = {
   1: 'Captain America: The First Avenger',
   2: 'Captain Marvel',
@@ -60,6 +73,17 @@ function PosterCard({ titulo, tituloBusqueda, tipo, visto }) {
   const apiKey = import.meta.env.VITE_TMDB_API_KEY
   const cacheKey = `${tipo}:${tituloBusqueda}`
 
+  const guardarCacheLocal = (key, value) => {
+    if (typeof window === 'undefined') return
+    try {
+      const cacheActual = JSON.parse(localStorage.getItem(TMDB_LOCAL_CACHE_KEY) ?? '{}')
+      cacheActual[key] = value
+      localStorage.setItem(TMDB_LOCAL_CACHE_KEY, JSON.stringify(cacheActual))
+    } catch {
+      // Si localStorage falla, mantiene el cache en memoria.
+    }
+  }
+
   useEffect(() => {
     let activo = true
 
@@ -91,11 +115,13 @@ function PosterCard({ titulo, tituloBusqueda, tipo, visto }) {
 
         if (activo) {
           posterCache.set(cacheKey, path)
+          guardarCacheLocal(cacheKey, path)
           setPosterPath(path)
         }
       } catch {
         if (activo) {
           posterCache.set(cacheKey, '')
+          guardarCacheLocal(cacheKey, '')
           setPosterPath('')
         }
       } finally {
@@ -144,6 +170,8 @@ function App() {
   const [vistos, setVistos] = useState({})
   const [filtroTipo, setFiltroTipo] = useState('todo')
   const [filtroVisto, setFiltroVisto] = useState('todos')
+  const [seleccionadoId, setSeleccionadoId] = useState(null)
+  const temporizadorSeleccionRef = useRef(null)
 
   useEffect(() => {
     setMontado(true)
@@ -189,6 +217,15 @@ function App() {
       ...anterior,
       [id]: !anterior[id],
     }))
+    setSeleccionadoId(id)
+
+    if (temporizadorSeleccionRef.current) {
+      clearTimeout(temporizadorSeleccionRef.current)
+    }
+
+    temporizadorSeleccionRef.current = setTimeout(() => {
+      setSeleccionadoId(null)
+    }, 550)
   }
 
   const listaFiltrada = useMemo(() => {
@@ -208,6 +245,14 @@ function App() {
     })
   }, [filtroTipo, filtroVisto, vistos])
 
+  useEffect(() => {
+    return () => {
+      if (temporizadorSeleccionRef.current) {
+        clearTimeout(temporizadorSeleccionRef.current)
+      }
+    }
+  }, [])
+
   if (!montado) {
     return (
       <main className="min-h-screen bg-slate-950 px-4 py-8 text-slate-100">
@@ -225,9 +270,6 @@ function App() {
               <h1 className="text-2xl font-black tracking-tight text-red-500 sm:text-3xl">MCU Tracker</h1>
               <p className="text-xs text-slate-400 sm:text-sm">Anotador de Universo Cinematografico Marvel de Santi y Clari</p>
             </div>
-            <span className="rounded-full border border-red-500/40 bg-red-500/10 px-3 py-1 text-xs font-semibold text-red-300">
-              {listaFiltrada.length} items visibles
-            </span>
           </div>
 
           <div className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
@@ -292,17 +334,24 @@ function App() {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {listaFiltrada.map((item) => {
             const visto = Boolean(vistos[item.id])
+            const recienSeleccionado = seleccionadoId === item.id
             return (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => alternarVisto(item.id)}
-                className={`overflow-hidden rounded-2xl border p-4 text-left shadow-lg shadow-black/20 transition duration-300 ${
+                className={`relative overflow-hidden rounded-2xl border p-4 text-left shadow-lg shadow-black/20 transition-all duration-300 ${
                   visto
                     ? 'border-slate-800 bg-slate-900/50 opacity-40 grayscale'
                     : 'border-slate-700 bg-slate-900/90 hover:-translate-y-1 hover:border-red-500 hover:bg-slate-800'
-                }`}
+                } ${recienSeleccionado ? 'scale-[0.98] ring-2 ring-emerald-400/80 shadow-emerald-500/20' : ''}`}
               >
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 to-transparent" />
+                {visto && (
+                  <span className="absolute right-3 top-3 rounded-full border border-emerald-400/40 bg-emerald-500/20 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-300">
+                    Visto
+                  </span>
+                )}
                 <PosterCard
                   titulo={item.titulo}
                   tituloBusqueda={MCU_SEARCH_TITLES[item.id] ?? item.titulo}
