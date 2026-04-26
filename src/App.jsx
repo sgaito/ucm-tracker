@@ -307,13 +307,25 @@ function App() {
 
           <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 text-xs sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0 sm:text-sm">
             <div className="min-w-[130px] rounded-xl border border-slate-800 bg-slate-900/70 p-2 text-slate-300 sm:min-w-0 sm:p-3">
-              Total vistos: <span className="font-semibold text-slate-100">{estadisticas.vistosTotal}</span>/{estadisticas.total}
+              Total restantes:{' '}
+              <span className="font-semibold text-slate-100">
+                {estadisticas.total - estadisticas.vistosTotal}
+              </span>
+              /{estadisticas.total}
             </div>
             <div className="min-w-[130px] rounded-xl border border-slate-800 bg-slate-900/70 p-2 text-slate-300 sm:min-w-0 sm:p-3">
-              Pelis vistas: <span className="font-semibold text-slate-100">{estadisticas.peliculasVistas}</span>/{estadisticas.totalPeliculas}
+              Pelis restantes:{' '}
+              <span className="font-semibold text-slate-100">
+                {estadisticas.totalPeliculas - estadisticas.peliculasVistas}
+              </span>
+              /{estadisticas.totalPeliculas}
             </div>
             <div className="min-w-[130px] rounded-xl border border-slate-800 bg-slate-900/70 p-2 text-slate-300 sm:min-w-0 sm:p-3">
-              Series vistas: <span className="font-semibold text-slate-100">{estadisticas.seriesVistas}</span>/{estadisticas.totalSeries}
+              Series restantes:{' '}
+              <span className="font-semibold text-slate-100">
+                {estadisticas.totalSeries - estadisticas.seriesVistas}
+              </span>
+              /{estadisticas.totalSeries}
             </div>
           </div>
 
