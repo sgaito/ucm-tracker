@@ -34,3 +34,16 @@ Pasos:
    - Build Command: `npm run build`
    - Output Directory: `dist`
 4. Deploy.
+
+## Progreso global compartido (todos ven lo mismo)
+
+La app usa `api/progreso` + Vercel KV para guardar un unico estado compartido de vistos.
+
+En Vercel:
+
+1. Abri tu proyecto -> **Storage**.
+2. Agrega **Upstash Redis** (o KV si ya lo tenias).
+3. Vercel inyecta automaticamente las variables necesarias.
+4. Redeploy del proyecto.
+
+Con eso, si una persona marca una peli como vista, el cambio queda guardado en la pagina para todos.

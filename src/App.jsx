@@ -172,23 +172,53 @@ function App() {
   const [filtroVisto, setFiltroVisto] = useState('todos')
   const [seleccionadoId, setSeleccionadoId] = useState(null)
   const temporizadorSeleccionRef = useRef(null)
+  const temporizadorSyncRef = useRef(null)
 
   useEffect(() => {
-    setMontado(true)
-    const guardado = localStorage.getItem('mcu-vistos')
+    const cargarProgreso = async () => {
+      setMontado(true)
 
-    if (guardado) {
       try {
-        setVistos(JSON.parse(guardado))
+        const respuesta = await fetch('/api/progreso')
+        if (!respuesta.ok) throw new Error('No se pudo cargar progreso global')
+        const json = await respuesta.json()
+        setVistos(json?.vistos ?? {})
       } catch {
-        setVistos({})
+        const guardado = localStorage.getItem('mcu-vistos')
+        if (guardado) {
+          try {
+            setVistos(JSON.parse(guardado))
+          } catch {
+            setVistos({})
+          }
+        }
       }
     }
+
+    cargarProgreso()
   }, [])
 
   useEffect(() => {
     if (!montado) return
     localStorage.setItem('mcu-vistos', JSON.stringify(vistos))
+
+    if (temporizadorSyncRef.current) {
+      clearTimeout(temporizadorSyncRef.current)
+    }
+
+    temporizadorSyncRef.current = setTimeout(async () => {
+      try {
+        await fetch('/api/progreso', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ vistos }),
+        })
+      } catch {
+        // Si falla la API, el progreso local sigue guardado.
+      }
+    }, 250)
   }, [vistos, montado])
 
   const estadisticas = useMemo(() => {
@@ -249,6 +279,9 @@ function App() {
     return () => {
       if (temporizadorSeleccionRef.current) {
         clearTimeout(temporizadorSeleccionRef.current)
+      }
+      if (temporizadorSyncRef.current) {
+        clearTimeout(temporizadorSyncRef.current)
       }
     }
   }, [])
